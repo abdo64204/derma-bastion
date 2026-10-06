@@ -90,7 +90,7 @@ describe('PaymentService', () => {
   });
 
   describe('validateCvv', () => {
-    it('accepts 3 and 4 digit CVVs', () => {
+    it('rejects nonnumeric CVV input', () => {
       expect(service.validateCvv('abc')).toBe(false);
     });
 
