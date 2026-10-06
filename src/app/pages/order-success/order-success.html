@@ -1,0 +1,163 @@
+<section class="success">
+  <div class="success__container">
+
+    @if (order) {
+      <div class="success__header">
+        <div class="success__icon">
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h1>{{ lang.t('success.thanks', { name: order.delivery.fullName }) }}</h1>
+        <p>{{ lang.t('success.received') }}</p>
+
+        <div class="success__number">
+          <span>{{ lang.t('success.orderNumber') }}</span>
+          <strong>{{ order.id }}</strong>
+        </div>
+        <p class="success__hint">{{ lang.t('success.hint') }}</p>
+      </div>
+
+      <div class="success__grid">
+
+        <!-- Delivery & Payment Info Card -->
+        <div class="success__card">
+          <h2>{{ lang.t('success.delivery') }}</h2>
+          <p><strong>{{ order.delivery.fullName }}</strong></p>
+          <p><span dir="ltr">{{ order.delivery.phone }}</span></p>
+          <p>{{ order.delivery.address }}</p>
+          <p>{{ order.delivery.city }}, {{ order.delivery.governorate }}</p>
+          @if (order.delivery.notes) {
+            <p class="success__notes">{{ lang.t('success.notes', { notes: order.delivery.notes }) }}</p>
+          }
+          <p class="success__meta">{{ lang.t('success.placedOn') }}: {{ lang.formatDate(order.createdAt, 'medium') }}</p>
+
+          <div class="success__payment-section">
+            <h3>{{ lang.t('success.payment') }}</h3>
+
+            <div class="success__payment-method">
+              @switch (order.payment.method) {
+                @case ('cod') {
+                  <div class="payment-badge-row">
+                    <strong>{{ lang.t('checkout.payment.cod') }}</strong>
+                    <span class="status-pill status-pill--cod">{{ lang.t('success.payment.status.paidOnDelivery') }}</span>
+                  </div>
+                  <p class="payment-note">{{ lang.t('success.payment.codNote') }}</p>
+                }
+
+                @case ('card') {
+                  <div class="payment-badge-row">
+                    <strong>{{ lang.t('checkout.payment.card') }}</strong>
+                    <span class="status-pill status-pill--pending">{{ lang.t('success.payment.status.pending') }}</span>
+                  </div>
+                  @if (order.payment.cardNetwork) {
+                    <p class="payment-card-meta">
+                      <span class="badge badge--detected">{{ order.payment.cardNetwork }}</span>
+                      <span dir="ltr">{{ order.payment.maskedCard }}</span>
+                    </p>
+                  }
+                  @if (order.payment.gatewayNote) {
+                    <p class="payment-note">{{ order.payment.gatewayNote }}</p>
+                  }
+                }
+
+                @case ('vodafone_cash') {
+                  <div class="payment-badge-row">
+                    <strong>{{ lang.t('checkout.payment.vodafone') }}</strong>
+                    <span class="status-pill status-pill--pending">{{ lang.t('success.payment.status.pending') }}</span>
+                  </div>
+                  <p class="payment-note">{{ lang.t('success.payment.walletNote') }}</p>
+
+                  @if (order.payment.receipt) {
+                    <div class="receipt-info">
+                      <span>📄 {{ lang.t('success.payment.receiptAttached', { fileName: order.payment.receipt.fileName }) }}</span>
+                      <button type="button" class="receipt-toggle-btn" (click)="toggleReceipt()">
+                        {{ showReceipt() ? lang.t('success.payment.hideReceipt') : lang.t('success.payment.viewReceipt') }}
+                      </button>
+
+                      @if (showReceipt() && order.payment.receipt.dataUrl) {
+                        <div class="receipt-lightbox">
+                          <img [src]="order.payment.receipt.dataUrl" [alt]="lang.t('checkout.payment.receipt.previewAlt')">
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+
+                @case ('instapay') {
+                  <div class="payment-badge-row">
+                    <strong>{{ lang.t('checkout.payment.instapay') }}</strong>
+                    <span class="status-pill status-pill--pending">{{ lang.t('success.payment.status.pending') }}</span>
+                  </div>
+                  <p class="payment-note">{{ lang.t('success.payment.instapayNote') }}</p>
+
+                  @if (order.payment.receipt) {
+                    <div class="receipt-info">
+                      <span>📄 {{ lang.t('success.payment.receiptAttached', { fileName: order.payment.receipt.fileName }) }}</span>
+                      <button type="button" class="receipt-toggle-btn" (click)="toggleReceipt()">
+                        {{ showReceipt() ? lang.t('success.payment.hideReceipt') : lang.t('success.payment.viewReceipt') }}
+                      </button>
+
+                      @if (showReceipt() && order.payment.receipt.dataUrl) {
+                        <div class="receipt-lightbox">
+                          <img [src]="order.payment.receipt.dataUrl" [alt]="lang.t('checkout.payment.receipt.previewAlt')">
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary Card -->
+        <div class="success__card">
+          <h2>{{ lang.t('success.orderSummary') }}</h2>
+
+          <ul class="success__items">
+            @for (item of order.items; track item.product.id) {
+              @let t = lang.text(item.product);
+              <li>
+                <span>{{ t.name }} × {{ item.quantity }}</span>
+                <span>{{ (item.product.price * item.quantity) | number }} {{ lang.t('currency') }}</span>
+              </li>
+            }
+          </ul>
+
+          <div class="success__row">
+            <span>{{ lang.t('success.subtotal') }}</span>
+            <span>{{ order.subtotal | number }} {{ lang.t('currency') }}</span>
+          </div>
+          <div class="success__row">
+            <span>{{ lang.t('success.shipping') }}</span>
+            <span>
+              @if (order.shipping === 0) {
+                {{ lang.t('success.shipping.free') }}
+              } @else {
+                {{ order.shipping | number }} {{ lang.t('currency') }}
+              }
+            </span>
+          </div>
+          <div class="success__row success__row--total">
+            <span>{{ lang.t('success.total') }}</span>
+            <span>{{ order.total | number }} {{ lang.t('currency') }}</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="success__actions">
+        <a routerLink="/track" [queryParams]="{ order: order.id }" class="btn">{{ lang.t('success.track') }}</a>
+        <a routerLink="/" class="btn success__secondary">{{ lang.t('success.continueShopping') }}</a>
+      </div>
+    } @else {
+      <div class="success__empty">
+        <h1>{{ lang.t('success.notFound') }}</h1>
+        <p>{{ lang.t('success.notFoundText') }}</p>
+        <a routerLink="/" class="btn">{{ lang.t('success.backToShop') }}</a>
+      </div>
+    }
+
+  </div>
+</section>

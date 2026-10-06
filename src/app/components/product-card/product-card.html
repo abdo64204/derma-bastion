@@ -1,0 +1,38 @@
+@let t = lang.text(product());
+
+<article class="card">
+  <button
+    type="button"
+    class="card__like"
+    [class.card__like--active]="wishlist.has(product().id)"
+    [attr.aria-label]="wishlist.has(product().id) ? lang.t('wishlist.remove') : lang.t('wishlist.add')"
+    (click)="toggleLike()">
+    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+  </button>
+
+  <a [routerLink]="['/product', product().id]" class="card__media">
+    @if (t.badge) {
+      <span class="card__badge">{{ t.badge }}</span>
+    }
+
+    @if (product().image) {
+      <img [src]="product().image" [alt]="t.name">
+    } @else {
+      <app-product-artwork [product]="product()"></app-product-artwork>
+    }
+  </a>
+
+  <div class="card__body">
+    <p class="card__category">{{ t.category }}</p>
+    <h3 class="card__name">
+      <a [routerLink]="['/product', product().id]">{{ t.name }}</a>
+    </h3>
+    <p class="card__price">{{ product().price | number }} {{ lang.t('currency') }}</p>
+    <button type="button" class="btn card__btn" (click)="addToCart()">
+      {{ lang.t(added() ? 'product.addedToCart' : 'product.addToCart') }}
+    </button>
+    <span class="card__feedback" aria-live="polite">{{ added() ? lang.t('product.addedToCart') : '' }}</span>
+  </div>
+</article>

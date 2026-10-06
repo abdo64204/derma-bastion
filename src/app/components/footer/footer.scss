@@ -1,0 +1,88 @@
+.footer {
+  background-color: var(--primary);
+  color: var(--bg);
+  margin-top: 0;
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 56px 24px 32px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+  }
+
+  &__logo {
+    margin: 0 0 12px;
+    font-size: 22px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bg);
+  }
+
+  &__about {
+    margin: 0;
+    max-width: 320px;
+    line-height: 1.6;
+    color: #bdbdbd;
+  }
+
+  &__heading {
+    margin: 0 0 16px;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    a {
+      color: #bdbdbd;
+      text-decoration: none;
+
+      &:hover {
+        color: var(--bg);
+      }
+    }
+  }
+
+  &__bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #2c2c2c;
+    font-size: 13px;
+    color: #8a8a8a;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__payments {
+    display: flex;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 700px) {
+  .footer__container {
+    grid-template-columns: 1fr;
+  }
+
+  .footer__bottom {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

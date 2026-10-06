@@ -1,0 +1,128 @@
+.header {
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--bg-card);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  z-index: 100;
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  &__logo {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  &__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+
+      a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover,
+      &.active {
+        color: var(--accent);
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__lang {
+    background: none;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: var(--font-body);
+    color: var(--primary);
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--primary);
+      color: var(--bg);
+    }
+  }
+
+  &__icon {
+    position: relative;
+    display: flex;
+    padding: 4px;
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+        text-decoration: none;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: -4px;
+    inset-inline-end: -6px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--accent);
+    color: #fff;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 900px) {
+  .header { position: static; }
+  .header__container { flex-wrap: wrap; padding: 14px 20px; }
+  .header__nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 12px 24px;
+  }
+}
+
+@media (max-width: 520px) {
+  .header__container { gap: 12px; padding: 12px 16px; }
+  .header__logo { font-size: clamp(15px, 5vw, 19px); }
+  .header__nav {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: clamp(8px, 3vw, 12px);
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+    scrollbar-width: thin;
+    white-space: nowrap;
+
+    a {
+      flex: 0 0 auto;
+      font-size: clamp(12px, 3.5vw, 14px);
+    }
+  }
+  .header__actions { gap: 10px; }
+  .header__lang { padding: 6px 9px; }
+}

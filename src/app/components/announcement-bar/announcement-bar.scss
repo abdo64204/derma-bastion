@@ -1,0 +1,14 @@
+.announcement {
+  background-color: var(--primary);
+  color: var(--bg);
+  text-align: center;
+  padding: 10px 16px;
+  font-size: 14px;
+
+  &__link {
+    color: var(--accent);
+  margin-inline-start: 8px;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}

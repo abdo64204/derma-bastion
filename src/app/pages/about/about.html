@@ -1,0 +1,35 @@
+<section class="about-hero">
+  <div class="about-hero__content">
+    <p class="about-hero__eyebrow">{{ lang.t('about.eyebrow') }}</p>
+    <h1 class="about-hero__title">
+      {{ lang.t('about.titleStart') }} <span>{{ lang.t('about.titleAccent') }}</span>
+    </h1>
+    <p class="about-hero__subtitle">{{ lang.t('about.subtitle') }}</p>
+
+    <div class="about-hero__actions">
+      <a routerLink="/" class="btn about-hero__primary">{{ lang.t('about.shopCta') }}</a>
+      <a routerLink="/contact" class="btn about-hero__outline">{{ lang.t('about.contactCta') }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="values">
+  <div class="values__container">
+    <h2 class="values__title">{{ lang.t('about.valuesTitle') }}</h2>
+
+    <div class="values__grid">
+      <article class="values__card">
+        <h3>{{ lang.t('about.value1.title') }}</h3>
+        <p>{{ lang.t('about.value1.text') }}</p>
+      </article>
+      <article class="values__card">
+        <h3>{{ lang.t('about.value2.title') }}</h3>
+        <p>{{ lang.t('about.value2.text') }}</p>
+      </article>
+      <article class="values__card">
+        <h3>{{ lang.t('about.value3.title') }}</h3>
+        <p>{{ lang.t('about.value3.text') }}</p>
+      </article>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,52 @@
+:host { display: block; scroll-margin-top: 140px; }
+
+.promo {
+  background-color: var(--bg-card);
+  padding: clamp(48px, 9vw, 72px) 20px;
+  text-align: center;
+
+  &__content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  &__eyebrow {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+
+  &__title {
+    font-size: clamp(28px, 5vw, 38px);
+    margin: 0 0 14px;
+    color: inherit;
+  }
+
+  &__text {
+    color: var(--text-light);
+    margin: 0 0 28px;
+  }
+
+  &--dark {
+    background-color: var(--primary);
+    color: var(--bg);
+
+    .promo__text {
+      color: #cfcfcf;
+    }
+
+    .btn {
+      background-color: var(--accent);
+      border-color: var(--accent);
+
+      &:hover {
+        background-color: var(--bg);
+        border-color: var(--bg);
+        color: var(--primary);
+      }
+    }
+  }
+}

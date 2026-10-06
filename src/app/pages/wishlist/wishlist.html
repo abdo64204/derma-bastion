@@ -1,0 +1,18 @@
+<section class="wishlist">
+  <div class="wishlist__container">
+    <h1 class="wishlist__title">{{ lang.t('wishlist.title') }}</h1>
+
+    @if (products().length > 0) {
+      <div class="wishlist__grid">
+        @for (product of products(); track product.id) {
+          <app-product-card [product]="product"></app-product-card>
+        }
+      </div>
+    } @else {
+      <div class="wishlist__empty">
+        <p>{{ lang.t('wishlist.empty') }}</p>
+        <a routerLink="/" class="btn">{{ lang.t('wishlist.discover') }}</a>
+      </div>
+    }
+  </div>
+</section>

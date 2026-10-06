@@ -1,0 +1,463 @@
+<section class="checkout">
+  <div class="checkout__container">
+    <h1 class="checkout__title">{{ lang.t('checkout.title') }}</h1>
+
+    @if (cart.cartItems().length > 0) {
+      <div class="checkout__layout">
+
+        <form class="form" [formGroup]="deliveryForm" (ngSubmit)="placeOrder()" novalidate>
+          <h2>{{ lang.t('checkout.delivery') }}</h2>
+
+          <div class="form__field">
+            <label for="fullName">{{ lang.t('checkout.field.fullName') }}</label>
+            <input id="fullName" type="text" formControlName="fullName" autocomplete="name">
+            @if (showDeliveryError('fullName')) {
+              <small class="form__error">{{ lang.t('checkout.field.fullName.error') }}</small>
+            }
+          </div>
+
+          <div class="form__field">
+            <label for="phone">{{ lang.t('checkout.field.phone') }}</label>
+            <input id="phone" type="tel" formControlName="phone" dir="ltr"
+              [placeholder]="lang.t('checkout.field.phone.placeholder')" autocomplete="tel">
+            @if (showDeliveryError('phone')) {
+              <small class="form__error">{{ lang.t('checkout.field.phone.error') }}</small>
+            }
+          </div>
+
+          <div class="form__row">
+            <div class="form__field">
+              <label for="governorate">{{ lang.t('checkout.field.governorate') }}</label>
+              <select id="governorate" formControlName="governorate">
+                <option value="">{{ lang.t('checkout.field.governorate.placeholder') }}</option>
+                @for (gov of governorates(); track gov) {
+                  <option [value]="gov">{{ gov }}</option>
+                }
+              </select>
+              @if (showDeliveryError('governorate')) {
+                <small class="form__error">{{ lang.t('checkout.field.governorate.error') }}</small>
+              }
+            </div>
+
+            <div class="form__field">
+              <label for="city">{{ lang.t('checkout.field.city') }}</label>
+              <input id="city" type="text" formControlName="city">
+              @if (showDeliveryError('city')) {
+                <small class="form__error">{{ lang.t('checkout.field.city.error') }}</small>
+              }
+            </div>
+          </div>
+
+          <div class="form__field">
+            <label for="address">{{ lang.t('checkout.field.address') }}</label>
+            <textarea id="address" rows="3" formControlName="address"
+              [placeholder]="lang.t('checkout.field.address.placeholder')"></textarea>
+            @if (showDeliveryError('address')) {
+              <small class="form__error">{{ lang.t('checkout.field.address.error') }}</small>
+            }
+          </div>
+
+          <div class="form__field">
+            <label for="notes">{{ lang.t('checkout.field.notes') }}</label>
+            <textarea id="notes" rows="2" formControlName="notes"></textarea>
+          </div>
+
+          <!-- ── Payment Methods ── -->
+          <h2>{{ lang.t('checkout.payment') }}</h2>
+
+          <div class="payment-options" role="radiogroup" [attr.aria-label]="lang.t('checkout.payment')">
+
+            <!-- 1. Cash on Delivery -->
+            <label
+              class="payment-option"
+              [class.payment-option--selected]="selectedPaymentMethod() === 'cod'">
+              <input
+                type="radio"
+                name="paymentMethodGroup"
+                value="cod"
+                [checked]="selectedPaymentMethod() === 'cod'"
+                (change)="selectPaymentMethod('cod')">
+              <div class="payment-option__content">
+                <div class="payment-option__header">
+                  <strong>{{ lang.t('checkout.payment.cod') }}</strong>
+                </div>
+                <span>{{ lang.t('checkout.payment.cod.desc') }}</span>
+              </div>
+            </label>
+
+            <!-- 2. Credit or Debit Card -->
+            <label
+              class="payment-option"
+              [class.payment-option--selected]="selectedPaymentMethod() === 'card'">
+              <input
+                type="radio"
+                name="paymentMethodGroup"
+                value="card"
+                [checked]="selectedPaymentMethod() === 'card'"
+                (change)="selectPaymentMethod('card')">
+              <div class="payment-option__content">
+                <div class="payment-option__header">
+                  <strong>{{ lang.t('checkout.payment.card') }}</strong>
+                  <div class="payment-option__badges" aria-label="Visa, Mastercard, Meeza">
+                    <span class="badge badge--visa">Visa</span>
+                    <span class="badge badge--mc">Mastercard</span>
+                    <span class="badge badge--meeza">Meeza</span>
+                  </div>
+                </div>
+                <span>{{ lang.t('checkout.payment.card.desc') }}</span>
+              </div>
+            </label>
+
+            <!-- Card Payment Details Box -->
+            @if (selectedPaymentMethod() === 'card') {
+              <div class="payment-subpanel" [formGroup]="cardForm">
+                <div class="form__field">
+                  <label for="cardholderName">{{ lang.t('checkout.payment.card.name') }}</label>
+                  <input
+                    id="cardholderName"
+                    type="text"
+                    formControlName="cardholderName"
+                    [placeholder]="lang.t('checkout.payment.card.name.placeholder')"
+                    autocomplete="cc-name">
+                  @if (showCardError('cardholderName')) {
+                    <small class="form__error">{{ lang.t('checkout.payment.card.name.error') }}</small>
+                  }
+                </div>
+
+                <div class="form__field">
+                  <div class="field-header">
+                    <label for="cardNumber">{{ lang.t('checkout.payment.card.number') }}</label>
+                    @if (cardNetwork() !== 'card') {
+                      <span class="badge badge--detected">
+                        @switch (cardNetwork()) {
+                          @case ('visa') { Visa }
+                          @case ('mastercard') { Mastercard }
+                          @case ('meeza') { Meeza }
+                        }
+                      </span>
+                    }
+                  </div>
+                  <input
+                    id="cardNumber"
+                    type="text"
+                    dir="ltr"
+                    formControlName="cardNumber"
+                    (input)="onCardNumberInput($event)"
+                    [placeholder]="lang.t('checkout.payment.card.number.placeholder')"
+                    autocomplete="cc-number">
+                  @if (showCardError('cardNumber')) {
+                    <small class="form__error">{{ lang.t('checkout.payment.card.number.error') }}</small>
+                  }
+                </div>
+
+                <div class="form__row">
+                  <div class="form__field">
+                    <label for="cardExpiry">{{ lang.t('checkout.payment.card.expiry') }}</label>
+                    <input
+                      id="cardExpiry"
+                      type="text"
+                      dir="ltr"
+                      formControlName="cardExpiry"
+                      (input)="onExpiryInput($event)"
+                      [placeholder]="lang.t('checkout.payment.card.expiry.placeholder')"
+                      autocomplete="cc-exp">
+                    @if (showCardError('cardExpiry')) {
+                      <small class="form__error">{{ lang.t('checkout.payment.card.expiry.error') }}</small>
+                    }
+                  </div>
+
+                  <div class="form__field">
+                    <label for="cardCvv">{{ lang.t('checkout.payment.card.cvv') }}</label>
+                    <input
+                      id="cardCvv"
+                      type="password"
+                      dir="ltr"
+                      formControlName="cardCvv"
+                      (input)="onCvvInput($event)"
+                      [placeholder]="lang.t('checkout.payment.card.cvv.placeholder')"
+                      autocomplete="cc-csc"
+                      maxlength="4">
+                    @if (showCardError('cardCvv')) {
+                      <small class="form__error">{{ lang.t('checkout.payment.card.cvv.error') }}</small>
+                    }
+                  </div>
+                </div>
+
+                <p class="payment-subpanel__security-note">
+                  🔒 {{ lang.t('checkout.payment.card.secureNotice') }}
+                </p>
+
+                <div class="payment-subpanel__gateway-box">
+                  <strong>ℹ️ Payment Integration Notice</strong>
+                  <p>{{ lang.t('checkout.payment.card.gatewayNotice') }}</p>
+                </div>
+              </div>
+            }
+
+            <!-- 3. Vodafone Cash -->
+            <label
+              class="payment-option"
+              [class.payment-option--selected]="selectedPaymentMethod() === 'vodafone_cash'">
+              <input
+                type="radio"
+                name="paymentMethodGroup"
+                value="vodafone_cash"
+                [checked]="selectedPaymentMethod() === 'vodafone_cash'"
+                (change)="selectPaymentMethod('vodafone_cash')">
+              <div class="payment-option__content">
+                <div class="payment-option__header">
+                  <strong>{{ lang.t('checkout.payment.vodafone') }}</strong>
+                  <span class="badge badge--vodafone">Vodafone Cash</span>
+                </div>
+                <span>{{ lang.t('checkout.payment.vodafone.desc') }}</span>
+              </div>
+            </label>
+
+            <!-- Vodafone Cash Details & Receipt Upload -->
+            @if (selectedPaymentMethod() === 'vodafone_cash') {
+              <div class="payment-subpanel">
+                <div class="transfer-box">
+                  <div class="transfer-box__row">
+                    <span class="transfer-box__label">{{ lang.t('checkout.payment.vodafone.walletLabel') }}</span>
+                    <strong class="transfer-box__value" dir="ltr">{{ paymentService.config.vodafoneCash.walletNumber }}</strong>
+                  </div>
+                  <div class="transfer-box__row">
+                    <span class="transfer-box__label">{{ lang.t('checkout.payment.vodafone.accountLabel') }}</span>
+                    <strong class="transfer-box__value">{{ paymentService.config.vodafoneCash.merchantName }}</strong>
+                  </div>
+                </div>
+
+                @if (!paymentService.config.vodafoneCash.isConfigured) {
+                  <p class="config-placeholder-note">
+                    ⚠️ <em>{{ lang.t('checkout.payment.vodafone.configNotice') }}</em>
+                  </p>
+                }
+
+                <div class="transfer-steps">
+                  <h4>{{ lang.t('checkout.payment.vodafone.instructions') }}</h4>
+                  <ol>
+                    <li>{{ lang.t('checkout.payment.vodafone.step1') }}</li>
+                    <li>{{ lang.t('checkout.payment.vodafone.step2', { amount: cart.total(), currency: lang.t('currency') }) }}</li>
+                    <li>{{ lang.t('checkout.payment.vodafone.step3') }}</li>
+                    <li>{{ lang.t('checkout.payment.vodafone.step4') }}</li>
+                  </ol>
+                </div>
+
+                <!-- Receipt Upload Box -->
+                <div class="receipt-upload">
+                  <h4>{{ lang.t('checkout.payment.receipt.title') }} <span class="required-star">*</span></h4>
+                  <p class="receipt-upload__instruction">{{ lang.t('checkout.payment.receipt.instruction') }}</p>
+
+                  <input
+                    #vodafoneFileInput
+                    type="file"
+                    id="vodafoneReceiptFile"
+                    class="receipt-upload__input"
+                    accept="image/jpeg,image/png,image/webp"
+                    (change)="onReceiptFileChange($event)">
+
+                  @if (receipt(); as r) {
+                    <div class="receipt-preview">
+                      @if (r.dataUrl) {
+                        <img [src]="r.dataUrl" [alt]="lang.t('checkout.payment.receipt.previewAlt')" class="receipt-preview__image">
+                      }
+                      <div class="receipt-preview__meta">
+                        <strong class="receipt-preview__filename">{{ r.fileName }}</strong>
+                        <span class="receipt-preview__size">({{ formatFileSize(r.fileSize) }})</span>
+                        <div class="receipt-preview__actions">
+                          <button
+                            type="button"
+                            class="receipt-btn receipt-btn--replace"
+                            (click)="vodafoneFileInput.click()">
+                            {{ lang.t('checkout.payment.receipt.replace') }}
+                          </button>
+                          <button
+                            type="button"
+                            class="receipt-btn receipt-btn--remove"
+                            (click)="removeReceipt(vodafoneFileInput)">
+                            {{ lang.t('checkout.payment.receipt.remove') }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <button
+                      type="button"
+                      class="btn btn--outline receipt-upload__btn"
+                      (click)="vodafoneFileInput.click()">
+                      📷 {{ lang.t('checkout.payment.receipt.choose') }}
+                    </button>
+                  }
+
+                  @if (receiptError()) {
+                    <small class="form__error receipt-error">{{ lang.t(receiptError()!) }}</small>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- 4. InstaPay -->
+            <label
+              class="payment-option"
+              [class.payment-option--selected]="selectedPaymentMethod() === 'instapay'">
+              <input
+                type="radio"
+                name="paymentMethodGroup"
+                value="instapay"
+                [checked]="selectedPaymentMethod() === 'instapay'"
+                (change)="selectPaymentMethod('instapay')">
+              <div class="payment-option__content">
+                <div class="payment-option__header">
+                  <strong>{{ lang.t('checkout.payment.instapay') }}</strong>
+                  <span class="badge badge--instapay">InstaPay</span>
+                </div>
+                <span>{{ lang.t('checkout.payment.instapay.desc') }}</span>
+              </div>
+            </label>
+
+            <!-- InstaPay Details & Receipt Upload -->
+            @if (selectedPaymentMethod() === 'instapay') {
+              <div class="payment-subpanel">
+                <div class="transfer-box">
+                  <div class="transfer-box__row">
+                    <span class="transfer-box__label">{{ lang.t('checkout.payment.instapay.ipaLabel') }}</span>
+                    <strong class="transfer-box__value" dir="ltr">{{ paymentService.config.instapay.identifier }}</strong>
+                  </div>
+                  <div class="transfer-box__row">
+                    <span class="transfer-box__label">{{ lang.t('checkout.payment.instapay.accountLabel') }}</span>
+                    <strong class="transfer-box__value">{{ paymentService.config.instapay.accountName }}</strong>
+                  </div>
+                </div>
+
+                @if (!paymentService.config.instapay.isConfigured) {
+                  <p class="config-placeholder-note">
+                    ⚠️ <em>{{ lang.t('checkout.payment.instapay.configNotice') }}</em>
+                  </p>
+                }
+
+                <div class="transfer-steps">
+                  <h4>{{ lang.t('checkout.payment.instapay.instructions') }}</h4>
+                  <ol>
+                    <li>{{ lang.t('checkout.payment.instapay.step1') }}</li>
+                    <li>{{ lang.t('checkout.payment.instapay.step2', { amount: cart.total(), currency: lang.t('currency') }) }}</li>
+                    <li>{{ lang.t('checkout.payment.instapay.step3') }}</li>
+                    <li>{{ lang.t('checkout.payment.instapay.step4') }}</li>
+                  </ol>
+                </div>
+
+                <!-- Receipt Upload Box -->
+                <div class="receipt-upload">
+                  <h4>{{ lang.t('checkout.payment.receipt.title') }} <span class="required-star">*</span></h4>
+                  <p class="receipt-upload__instruction">{{ lang.t('checkout.payment.receipt.instruction') }}</p>
+
+                  <input
+                    #instapayFileInput
+                    type="file"
+                    id="instapayReceiptFile"
+                    class="receipt-upload__input"
+                    accept="image/jpeg,image/png,image/webp"
+                    (change)="onReceiptFileChange($event)">
+
+                  @if (receipt(); as r) {
+                    <div class="receipt-preview">
+                      @if (r.dataUrl) {
+                        <img [src]="r.dataUrl" [alt]="lang.t('checkout.payment.receipt.previewAlt')" class="receipt-preview__image">
+                      }
+                      <div class="receipt-preview__meta">
+                        <strong class="receipt-preview__filename">{{ r.fileName }}</strong>
+                        <span class="receipt-preview__size">({{ formatFileSize(r.fileSize) }})</span>
+                        <div class="receipt-preview__actions">
+                          <button
+                            type="button"
+                            class="receipt-btn receipt-btn--replace"
+                            (click)="instapayFileInput.click()">
+                            {{ lang.t('checkout.payment.receipt.replace') }}
+                          </button>
+                          <button
+                            type="button"
+                            class="receipt-btn receipt-btn--remove"
+                            (click)="removeReceipt(instapayFileInput)">
+                            {{ lang.t('checkout.payment.receipt.remove') }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <button
+                      type="button"
+                      class="btn btn--outline receipt-upload__btn"
+                      (click)="instapayFileInput.click()">
+                      📷 {{ lang.t('checkout.payment.receipt.choose') }}
+                    </button>
+                  }
+
+                  @if (receiptError()) {
+                    <small class="form__error receipt-error">{{ lang.t(receiptError()!) }}</small>
+                  }
+                </div>
+              </div>
+            }
+
+          </div>
+
+          <button type="submit" class="btn form__submit">{{ lang.t('checkout.submit') }}</button>
+        </form>
+
+        <aside class="summary">
+          <h2>{{ lang.t('checkout.summary.title') }}</h2>
+
+          <ul class="summary__items">
+            @for (item of cart.cartItems(); track item.product.id) {
+              @let t = lang.text(item.product);
+              <li>
+                <span>{{ t.name }} × {{ item.quantity }}</span>
+                <span>{{ (item.product.price * item.quantity) | number }} {{ lang.t('currency') }}</span>
+              </li>
+            }
+          </ul>
+
+          <div class="summary__row">
+            <span>{{ lang.t('checkout.summary.subtotal') }}</span>
+            <span>{{ cart.subtotal() | number }} {{ lang.t('currency') }}</span>
+          </div>
+
+          <div class="summary__row">
+            <span>{{ lang.t('checkout.summary.shipping') }}</span>
+            <span>
+              @if (cart.shipping() === 0) {
+                {{ lang.t('checkout.summary.shipping.free') }}
+              } @else {
+                {{ cart.shipping() | number }} {{ lang.t('currency') }}
+              }
+            </span>
+          </div>
+
+          <div class="summary__row summary__row--total">
+            <span>{{ lang.t('checkout.summary.total') }}</span>
+            <span>{{ cart.total() | number }} {{ lang.t('currency') }}</span>
+          </div>
+
+          <div class="summary__payment-method">
+            <span>{{ lang.t('checkout.payment') }}:</span>
+            <strong>
+              @switch (selectedPaymentMethod()) {
+                @case ('cod') { {{ lang.t('checkout.payment.cod') }} }
+                @case ('card') { {{ lang.t('checkout.payment.card') }} }
+                @case ('vodafone_cash') { {{ lang.t('checkout.payment.vodafone') }} }
+                @case ('instapay') { {{ lang.t('checkout.payment.instapay') }} }
+              }
+            </strong>
+          </div>
+
+          <a routerLink="/cart" class="summary__edit">{{ lang.t('checkout.summary.edit') }}</a>
+        </aside>
+
+      </div>
+    } @else {
+      <div class="checkout__empty">
+        <p>{{ lang.t('checkout.empty') }}</p>
+        <a routerLink="/" class="btn">{{ lang.t('checkout.empty.cta') }}</a>
+      </div>
+    }
+  </div>
+</section>

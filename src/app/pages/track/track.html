@@ -1,0 +1,85 @@
+<section class="track">
+  <div class="track__container">
+    <h1 class="track__title">{{ lang.t('track.title') }}</h1>
+    <p class="track__subtitle">{{ lang.t('track.subtitle') }}</p>
+
+    <form class="track__form" (ngSubmit)="search()">
+      <input
+        type="text"
+        name="orderNumber"
+        [(ngModel)]="orderNumber"
+        [placeholder]="lang.t('track.placeholder')"
+        [attr.aria-label]="lang.t('track.input.label')">
+      <button type="submit" class="btn" [disabled]="!orderNumber.trim()">{{ lang.t('track.btn') }}</button>
+    </form>
+
+    @if (searched()) {
+      @if (order(); as tracked) {
+
+        <div class="track__card">
+          <div class="track__summary">
+            <div>
+              <span>{{ lang.t('track.orderNumber') }}</span>
+              <strong>{{ tracked.id }}</strong>
+            </div>
+            <div>
+              <span>{{ lang.t('track.placedOn') }}</span>
+              <strong>{{ lang.formatDate(tracked.createdAt, 'shortDate') }}</strong>
+            </div>
+            <div>
+              <span>{{ lang.t('track.total') }}</span>
+              <strong>{{ tracked.total | number }} {{ lang.t('currency') }}</strong>
+            </div>
+            <div>
+              <span>{{ lang.t('track.deliveringTo') }}</span>
+              <strong>{{ tracked.delivery.city }}, {{ tracked.delivery.governorate }}</strong>
+            </div>
+            <div>
+              <span>{{ lang.t('success.payment') }}</span>
+              <strong>
+                @switch (tracked.payment.method) {
+                  @case ('cod') { {{ lang.t('checkout.payment.cod') }} }
+                  @case ('card') { {{ lang.t('checkout.payment.card') }} }
+                  @case ('vodafone_cash') { {{ lang.t('checkout.payment.vodafone') }} }
+                  @case ('instapay') { {{ lang.t('checkout.payment.instapay') }} }
+                }
+              </strong>
+            </div>
+          </div>
+
+          <ol class="timeline">
+            @for (step of stepKeys; track step.titleKey; let i = $index) {
+              <li
+                class="timeline__item"
+                [class.timeline__item--done]="isDone(i)"
+                [class.timeline__item--current]="isCurrent(i)">
+
+                <span class="timeline__dot">
+                  @if (isDone(i)) {
+                    ✓
+                  }
+                </span>
+
+                <div class="timeline__content">
+                  <h3>{{ lang.t(step.titleKey) }}</h3>
+                  <p>{{ lang.t(step.textKey) }}</p>
+                  @if (i <= currentStep()) {
+                    <small>{{ lang.formatDate(stepTime(i), 'time') }}</small>
+                  }
+                </div>
+              </li>
+            }
+          </ol>
+
+          <p class="track__demo" role="note">{{ lang.t('track.demo') }}</p>
+        </div>
+
+      } @else {
+        <div class="track__empty">
+          <h2>{{ lang.t('track.notFound') }}</h2>
+          <p>{{ lang.t('track.notFoundText') }}</p>
+        </div>
+      }
+    }
+  </div>
+</section>

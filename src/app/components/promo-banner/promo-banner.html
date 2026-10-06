@@ -1,0 +1,8 @@
+<section class="promo" [class.promo--dark]="variant() === 'dark'">
+  <div class="promo__content">
+    <p class="promo__eyebrow">{{ eyebrow() }}</p>
+    <h2 class="promo__title">{{ title() }}</h2>
+    <p class="promo__text">{{ text() }}</p>
+    <a routerLink="/" [fragment]="targetFragment()" class="btn">{{ buttonText() }}</a>
+  </div>
+</section>

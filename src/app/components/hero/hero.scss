@@ -1,0 +1,31 @@
+.hero {
+  background-color: var(--bg-card);
+  padding: clamp(64px, 12vw, 100px) 20px;
+  text-align: center;
+
+  &__content {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  &__eyebrow {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 16px;
+  }
+
+  &__title {
+    font-size: clamp(36px, 7vw, 56px);
+    line-height: 1.15;
+    margin: 0 0 20px;
+  }
+
+  &__subtitle {
+    font-size: clamp(16px, 2.4vw, 18px);
+    color: var(--text-light);
+    margin: 0 0 36px;
+  }
+}

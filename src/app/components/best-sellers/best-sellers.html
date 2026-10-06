@@ -1,0 +1,41 @@
+<section class="best">
+  <div class="best__container">
+  <h2 id="products" class="best__title">{{ lang.t('catalog.title') }}</h2>
+  <p class="best__subtitle">{{ lang.t('catalog.subtitle') }}</p>
+    <div class="catalog-tools">
+      <label class="catalog-tools__search">
+        <span>{{ lang.t('catalog.search.label') }}</span>
+        <input type="search" [value]="searchQuery()" (input)="onSearch($event)"
+          [placeholder]="lang.t('catalog.search.placeholder')" autocomplete="off">
+      </label>
+      <label class="catalog-tools__sort">
+        <span>{{ lang.t('catalog.sort.label') }}</span>
+        <select [value]="sortOrder()" (change)="onSortChange($event)">
+          <option value="featured">{{ lang.t('catalog.sort.featured') }}</option>
+          <option value="price-asc">{{ lang.t('catalog.sort.priceAsc') }}</option>
+          <option value="price-desc">{{ lang.t('catalog.sort.priceDesc') }}</option>
+        </select>
+      </label>
+    </div>
+    <div class="catalog-categories" role="group" [attr.aria-label]="lang.t('catalog.category.label')">
+      @for (category of categories; track category.value) {
+        <button type="button" class="catalog-categories__button"
+          [class.catalog-categories__button--active]="selectedCategory() === category.value"
+          [attr.aria-pressed]="selectedCategory() === category.value"
+          (click)="selectedCategory.set(category.value)">
+          {{ lang.t(category.key) }}
+        </button>
+      }
+    </div>
+    <p class="catalog-count" aria-live="polite">
+      {{ lang.t(visibleProducts().length === 1 ? 'catalog.results.one' : 'catalog.results.many', { count: visibleProducts().length }) }}
+    </p>
+    <div class="best__grid">
+      @for (product of visibleProducts(); track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+      } @empty {
+        <p class="catalog-empty">{{ lang.t('catalog.empty') }}</p>
+      }
+    </div>
+  </div>
+</section>

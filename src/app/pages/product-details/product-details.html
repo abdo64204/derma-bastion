@@ -1,0 +1,77 @@
+<section class="details">
+  <div class="details__container">
+    <a routerLink="/" class="details__back">{{ lang.t('details.back') }}</a>
+
+    @if (product) {
+      @let t = lang.text(product);
+
+      <div class="details__grid">
+
+        <div class="details__media">
+          @if (t.badge) {
+            <span class="details__badge">{{ t.badge }}</span>
+          }
+          @if (product.image) {
+            <img [src]="product.image" [alt]="t.name">
+          } @else {
+            <app-product-artwork [product]="product"></app-product-artwork>
+          }
+        </div>
+
+        <div class="details__info">
+          <p class="details__category">{{ t.category }}</p>
+          <h1 class="details__name">{{ t.name }}</h1>
+          <p class="details__price">{{ product.price | number }} {{ lang.t('currency') }}</p>
+          <p class="details__description">{{ t.description }}</p>
+
+          <div class="details__buy">
+            <div class="details__qty">
+              <button type="button" (click)="decrease()" [attr.aria-label]="lang.t('details.qty.decrease')">−</button>
+              <span>{{ quantity() }}</span>
+              <button type="button" (click)="increase()" [attr.aria-label]="lang.t('details.qty.increase')">+</button>
+            </div>
+            <button type="button" class="btn details__add" (click)="addToCart()">
+              {{ lang.t('product.addToCart') }}
+            </button>
+            <button
+              type="button"
+              class="details__like"
+              [class.details__like--active]="wishlist.has(product.id)"
+              [attr.aria-label]="wishlist.has(product.id) ? lang.t('wishlist.remove') : lang.t('wishlist.add')"
+              (click)="wishlist.toggle(product.id)">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="details__section">
+            <h2>{{ lang.t('details.benefits') }}</h2>
+            <ul>
+              @for (benefit of t.benefits; track benefit) {
+                <li>{{ benefit }}</li>
+              }
+            </ul>
+          </div>
+
+          <div class="details__section">
+            <h2>{{ lang.t('details.howToUse') }}</h2>
+            <p>{{ t.howToUse }}</p>
+          </div>
+
+          <div class="details__section">
+            <h2>{{ lang.t('details.ingredients') }}</h2>
+            <p>{{ t.ingredients }}</p>
+          </div>
+        </div>
+
+      </div>
+    } @else {
+      <div class="details__empty">
+        <h1>{{ lang.t('details.notFound') }}</h1>
+        <p>{{ lang.t('details.notFoundText') }}</p>
+        <a routerLink="/" class="btn">{{ lang.t('details.back') }}</a>
+      </div>
+    }
+  </div>
+</section>
